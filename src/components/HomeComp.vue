@@ -4,8 +4,25 @@
             <div class="column_right column_right_products_container">
                 <div class="product__area">
                     <ProductComp
-                        :key="product.productId" 
-                        v-for="product in products"
+                        :key="productId" 
+                        v-for="{ productId, code, title, primaryImageUrl, assocProducts, priceGoldAlt, priceRetailAlt, priceGold, priceRetail, hasAlternateUnit, unitFull, unit, unitRatio, unitAlt, unitRatioAlt } in products"
+                        :dataProductId="productId"
+                        :productCode="code"
+                        :imgUrl="primaryImageUrl"
+                        :productTitle="title"
+                        :assocProducts="assocProducts"
+                        :priceGoldAlt="priceGoldAlt"
+                        :priceRetailAlt="priceRetailAlt"
+                        :priceGold="priceGold"
+                        :priceRetail="priceRetail"
+                        :hasAlternateUnit="hasAlternateUnit"
+                        :unitFull="unitFull"
+                        :unit="unit"
+                        :unitRatio="unitRatio"
+                        :unitAlt="unitAlt"
+                        :unitRatioAlt="unitRatioAlt"
+
+
                     />
                 </div>
             </div>
