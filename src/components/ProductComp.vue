@@ -1,7 +1,7 @@
 <template>
     <div id="products_section">
         <div class="products_page pg_0">
-            <div class="product product_horizontal">                                
+            <div class="product product_horizontal">
                 <span class="product_code">Код: {{ productCode }}</span>
                 <div class="product_status_tooltip_container">
                     <span class="product_status">Наличие</span>
@@ -20,17 +20,17 @@
                 </div>
                 <div class="product_units">
                     <div class="unit--wrapper">
-                        <div class="unit--select unit--active">
-                            <p class="ng-binding">За м. кв.</p>
+                        <div @click="selectedFirstUnit = true; selectedSecondUnit = false" :class="['unit--select', {'unit--active': selectedFirstUnit}]">
+                            <p class="ng-binding">За {{ this.unitAlt }}</p>
                         </div>
-                        <div class="unit--select">
-                            <p class="ng-binding">За упаковку</p>
+                        <div @click="selectedFirstUnit = false; selectedSecondUnit = true" :class="['unit--select', {'unit--active': selectedSecondUnit}]">
+                            <p class="ng-binding">За {{ this.unit }}</p>
                         </div>
                     </div>
                 </div>
                 <p class="product_price_club_card">
                     <span class="product_price_club_card_text">По карте<br>клуба</span>
-                    <span class="goldPrice">{{ priceGoldAltComputed }}</span>
+                    <span class="goldPrice">{{ priceGoldToShow }}</span>
                     <span class="rouble__i black__i">
                         <svg version="1.0" id="rouble__b" xmlns="http://www.w3.org/2000/svg" x="0" y="0" width="30px" height="22px" viewBox="0 0 50 50" enable-background="new 0 0 50 50" xml:space="preserve">
                         <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#rouble_black"></use>
@@ -38,7 +38,7 @@
                     </span>
                 </p>
                 <p class="product_price_default">
-                    <span class="retailPrice">{{ priceRetailAltComputed }}</span>
+                    <span class="retailPrice">{{ priceRetailToShow }}</span>
                     <span class="rouble__i black__i">
                         <svg version="1.0" id="rouble__g" xmlns="http://www.w3.org/2000/svg" x="0" y="0" width="30px" height="22px" viewBox="0 0 50 50" enable-background="new 0 0 50 50" xml:space="preserve">
                         <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#rouble_gray"></use>
@@ -63,9 +63,9 @@
                 <div class="product__wrapper">
                     <div class="product_count_wrapper">
                         <div class="stepper">
-                            <input class="product__count stepper-input" type="text" value="1">
-                            <span class="stepper-arrow up"></span>
-                            <span class="stepper-arrow down"></span>                                            
+                            <input class="product__count stepper-input" type="number" required min="1" max="9" step="1" v-model="counterValue">
+                            <span @click="increaseCounter" class="stepper-arrow up"></span>
+                            <span @click="decreaseCounter" class="stepper-arrow down"></span>                                            
                         </div>
                     </div>
                     <span class="btn btn_cart" data-url="/cart/" :data-product-id="dataProductId">
@@ -89,68 +89,67 @@
 export default {
     data() {
         return {
+        counterValue: 1,
+        selectedFirstUnit: false,
+        selectedSecondUnit: true,
+        }
+    },
+    methods: {
+        decreaseCounter() {
+            if(this.counterValue > 1){
+                this.counterValue--;
+            }
+        },
+        increaseCounter() {
+            this.counterValue++;
+
         }
     },
     props: {
         dataProductId: {
             type: String,
-            default: ""
         },
         productCode: {
             type: String,
-            default: ""
         },
         productTitle: {
             type: String,
-            default: ""
         },
         imgUrl: {
             type: String,
-            default: ""
         },
         assocProducts: {
             type: String,
-            default: ""
         },
         priceGoldAlt: {
             type: Number,
-            default: null
         },
         priceRetailAlt: {
             type: Number,
-            default: null
         },
         priceGold: {
             type: Number,
-            default: null
         },
         priceRetail: {
             type: Number,
-            default: null
         },
         hasAlternateUnit: {
             type: Boolean,
-            default: false
         },
         unitFull: {
             type: String,
-            default: ""           
         },
         unit: {
             type: String,
-            default: ""
         },
         unitRatio: {
             type: Number,
-            default: null
         },
         unitAlt: {
             type: String,
-            default: ""
         },
         unitRatioAlt: {
             type: Number,
-            default: null
         }
     },
     computed: {
@@ -167,11 +166,55 @@ export default {
 
             return filtered;
         },
+        priceGoldComputed() {
+            if (this.counterValue > 0) {
+                const totalPrice = this.priceGold * this.counterValue;
+                return currencyFormatter.format(totalPrice);
+            } else {
+                const totalPrice = this.priceGold;
+                return currencyFormatter.format(totalPrice);
+            }
+        },
+        priceRetailComputed() {
+            if (this.counterValue > 0) {
+                const totalPrice = this.priceRetail * this.counterValue;
+                return currencyFormatter.format(totalPrice);
+            } else {
+                const totalPrice = this.priceRetail;
+                return currencyFormatter.format(totalPrice);
+            }
+        },
         priceGoldAltComputed() {
-            return currencyFormatter.format(this.priceGoldAlt);
+            if (this.counterValue > 0) {
+                const totalPrice = this.priceGoldAlt * this.counterValue;
+                return currencyFormatter.format(totalPrice);
+            } else {
+                const totalPrice = this.priceGoldAlt;
+                return currencyFormatter.format(totalPrice);
+            }
         },
         priceRetailAltComputed() {
-            return currencyFormatter.format(this.priceRetailAlt);
+            if (this.counterValue > 0) {
+                const totalPrice = this.priceRetailAlt * this.counterValue;
+                return currencyFormatter.format(totalPrice);
+            } else {
+                const totalPrice = this.priceRetailAlt;
+                return currencyFormatter.format(totalPrice);
+            }
+        },
+        priceGoldToShow() {
+            if(this.selectedFirstUnit == true) {
+                return this.priceGoldAltComputed;
+            } else {
+                return this.priceGoldComputed;
+            }
+        },
+        priceRetailToShow() {
+            if(this.selectedFirstUnit == true) {
+                return this.priceRetailAltComputed;
+            } else {
+                return this.priceRetailComputed;
+            }
         },
         unitInfoText() {
             if (this.unitFull == "упаковка") {
